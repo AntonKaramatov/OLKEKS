@@ -15,6 +15,14 @@ app.use(bodyParser.json());
 var routes = require('./routes/recipeRoutes');
 routes(app);
 
+app.use(function (req, res, next) {
+  res.status(404).send({message: 'Path not found!'});
+});
+
+app.use(function (err, req, res, next) {
+  console.error(err.stack)
+  res.status(500).send({message: 'Something broke!'});
+});
 
 app.listen(port);
 

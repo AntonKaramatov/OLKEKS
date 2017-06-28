@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var RecipeSchema = new Schema({
     name: {
         type: String,
-        Required: 'Recipe name is required'
+        required: [true, 'Recipe name is required']
     },
     createdDate: {
         type: Date,
@@ -14,7 +14,7 @@ var RecipeSchema = new Schema({
     },
     text: { 
         type: String,
-        Required: 'Recipe text is required'
+        required: [true, 'Recipe text is required']
     }
 });
 
