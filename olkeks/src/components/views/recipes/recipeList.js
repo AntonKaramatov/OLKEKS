@@ -22,9 +22,9 @@ class RecipeList extends React.Component {
         });
 
         return (
-        <div>
-            {recipeNodes}
-        </div>
+            <div>
+                {recipeNodes}
+            </div>
         );
     }
 }

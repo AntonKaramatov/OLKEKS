@@ -15,6 +15,11 @@ var RecipeSchema = new Schema({
     text: { 
         type: String,
         required: [true, 'Recipe text is required']
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        required: [true, 'user is required'],
+        ref: 'User'
     }
 });
 
