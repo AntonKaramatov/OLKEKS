@@ -5,8 +5,8 @@ class RecipeService {
         this.url = baseUrl;
     }
 
-    getAll() {
-        return this.getJsonAsPromise(this.url)
+    getAll(searchQuery) {
+        return this.getJsonAsPromise(this.url, searchQuery)
             .then((recipes) => {
                 if(!recipes)
                     recipes = [];

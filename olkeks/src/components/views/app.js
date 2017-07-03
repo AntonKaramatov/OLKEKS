@@ -12,13 +12,22 @@ class App extends React.Component {
     super(props);
     this.recipeService = new RecipeService(RECIPE_SERVICE_URL);
     this.userService = new UserService(USER_SERVICE_URL);
-    this.session = {};
+    var userId = localStorage.getItem("session_userId");
+    var username = localStorage.getItem("session_username");
+    this.session = (userId !== null && username !== null ? {userId: userId, username: username} : {});
 
     this.setSession = this.setSession.bind(this);
   }
 
   setSession(session) {
     this.session = session;
+    if(session.userId) {
+      localStorage.setItem("session_userId", session.userId);
+      localStorage.setItem("session_username", session.username);
+    } else {
+      localStorage.removeItem("session_userId");
+      localStorage.removeItem("session_username");
+    }
     this.forceUpdate();
   }
 
@@ -29,6 +38,14 @@ class App extends React.Component {
       session: this.session,
       setSession: this.setSession,
       apiErrorHandler: (error) => {
+        if(error.status === 401) {
+          if(this.session.userId) {
+            alert("Your session has expired. Please log in.");
+          }
+          this.setSession({});
+          this.context.router.push({ pathname: "/user" });          
+          return;
+        }
         var message = "Something went wrong!";
         if(error.responseText) {
           var errorMessage = JSON.parse(error.responseText);
@@ -55,6 +72,10 @@ class App extends React.Component {
 
 App.propTypes = {
   children: React.PropTypes.node
+}
+
+App.contextTypes = {
+  router: React.PropTypes.object
 }
 
 App.childContextTypes = {

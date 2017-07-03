@@ -4,7 +4,9 @@ import {browserHistory} from 'react-router';
 
 import Routes from './routes';
 
-import './index.css';
+import $ from 'jquery'
+window.$ = window.jQuery = $;
+import 'bootstrap'
 
 ReactDOM.render(
   <Routes history={browserHistory} />,

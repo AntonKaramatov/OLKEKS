@@ -36,6 +36,12 @@ class Recipe extends React.Component {
         this.resetChanges = this.resetChanges.bind(this);
     }
 
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.location && nextProps.location.query && nextProps.location.query.addNew === 'true') {
+            this.setState({recipe: {name: "", text: ""}});            
+        }
+    }
+
     handleTextChange(e) {
         let recipe = this.state.recipe;
         recipe[e.target.name] = e.target.value;
@@ -45,12 +51,15 @@ class Recipe extends React.Component {
     addRecipe() {
         let recipe = {name: this.state.recipe.name, text: this.state.recipe.text, createdDate: new Date()};
         this.context.recipeService.add(recipe).then((recipe) => {
+            recipe.user = {_id: this.context.session.userId, username: this.context.session.username};
+            this.setState({recipe: recipe});
             this.context.router.push({ pathname: `/recipe/${recipe._id}` });
         }, this.context.apiErrorHandler);
     }
 
     editRecipe() {
         this.context.recipeService.update(this.state.recipe).then((recipe) => {
+            recipe.user = {_id: this.context.session.userId, username: this.context.session.username};
             this.setState({recipe: recipe, edit: false});
         }, this.context.apiErrorHandler);
     }
@@ -94,7 +103,7 @@ class Recipe extends React.Component {
                     <h4>{this.state.recipe.name}</h4>
                     <p>{this.state.recipe.user.username}</p>
                     <p>{this.state.recipe.createdDate}</p>
-                    <p>{this.state.recipe.text}</p>
+                    <pre>{this.state.recipe.text}</pre>
                     {this.context.session.userId === this.state.recipe.user._id && (<button onClick={this.enterEditMode}>Edit</button>)}
                 </div>
             )

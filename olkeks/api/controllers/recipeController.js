@@ -5,7 +5,15 @@ var mongoose = require('mongoose');
 var Recipe = mongoose.model('Recipes');
 
 exports.getAll = function (req, res) {
-  Recipe.find({}, '-text')
+  var searchQuery = {};
+  if(req.query.userId) {
+    searchQuery.user = req.query.userId;
+  }
+  if(req.query.search) {
+    searchQuery.$or = [{name: { $regex: req.query.search, $options: 'i' }},
+      {text: { $regex: req.query.search, $options: 'i' }}];
+  }
+  Recipe.find(searchQuery, '-text')
     .populate('user', 'username')
     .exec(function (err, recipe) {
       if (err) {

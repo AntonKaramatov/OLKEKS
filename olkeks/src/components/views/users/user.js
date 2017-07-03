@@ -18,14 +18,16 @@ class User extends React.Component {
         this.setState({ user: user });
     }
 
-    register() {
+    register(e) {
+        e.preventDefault();
         this.context.userService.register(this.state.user).then((user) => {
                 this.context.router.push({ pathname: "/" });
                 this.context.setSession({userId: user.userId, username: user.username});
             }, this.context.apiErrorHandler);
     }
 
-    login() {
+    login(e) {
+        e.preventDefault();
         this.context.userService.login(this.state.user).then((user) => {
                 this.context.router.push({ pathname: "/" });
                 this.context.setSession({userId: user.userId, username: user.username});
@@ -36,14 +38,14 @@ class User extends React.Component {
         let register = (this.props.location && this.props.location.query && this.props.location.query.register === 'true');
         
         return (
-            <div>
+            <form onSubmit={register ? this.register : this.login}>
                 <label htmlFor="username">Username: </label>
                 <input type="text" name="username" id="username" onChange={this.handleTextChange} />
                 <label htmlFor="password">Password: </label>
                 <input type="password" name="password" id="password" onChange={this.handleTextChange} />
-                {register && (<button onClick={this.register}>Register</button>)}
-                {!register && (<button onClick={this.login}>Login</button>)}
-            </div>
+                {register && (<button type="submit">Register</button>)}
+                {!register && (<button type="submit">Login</button>)}
+            </form>
         )
     }
 }
