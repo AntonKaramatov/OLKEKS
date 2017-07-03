@@ -62,6 +62,21 @@ class RecipeService {
         );
     }
 
+    comment(recipeId, comment) {
+        let url = this.url;
+        return new Promise(
+            function(resolve, reject) {
+                $.ajax({
+                    url: `${url}/comment/${recipeId}`,
+                    dataType: 'json',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(comment)
+                }).done(resolve).fail(reject);
+            }
+        );
+    }
+
     getJsonAsPromise(url, data) {
         return new Promise(function (resolve, reject) {
             $.getJSON(url, data).done(resolve).fail(reject);

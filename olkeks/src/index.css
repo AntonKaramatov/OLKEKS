@@ -7,3 +7,7 @@
     margin-bottom: 10px;
     height: 20em !important;
 }
+
+.recipe-details, .comment-from {    
+    margin-bottom: 10px;
+}

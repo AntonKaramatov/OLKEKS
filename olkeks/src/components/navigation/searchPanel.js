@@ -28,7 +28,7 @@ class SearchPanel extends React.Component {
         return (
             <form className="navbar-form navbar-left" onSubmit={this.search}>
                 <div className="form-group">
-                    <input type="text" name="search" id="search" className="form-control" placeholder="Search" onChange={this.handleTextChange} />
+                    <input type="text" name="search" id="search" className="form-control" placeholder="Search" value={this.state.search} onChange={this.handleTextChange} />
                 </div>
                 <button type="submit" className="btn btn-default">Search</button>
             </form>

@@ -13,7 +13,8 @@ exports.getAll = function (req, res) {
     searchQuery.$or = [{name: { $regex: req.query.search, $options: 'i' }},
       {text: { $regex: req.query.search, $options: 'i' }}];
   }
-  Recipe.find(searchQuery, '-text')
+  Recipe.find(searchQuery, '-text -comments')
+    .sort('-createdDate')
     .populate('user', 'username')
     .exec(function (err, recipe) {
       if (err) {
@@ -40,6 +41,7 @@ exports.create = function (req, res) {
 exports.get = function (req, res) {
   Recipe.findById(req.params.recipeId)
     .populate('user', 'username')
+    .populate('comments.user', 'username')
     .exec(function (err, recipe) {
     if (err) {
       return res.status(400).send({ message: err.message });
@@ -51,9 +53,11 @@ exports.get = function (req, res) {
   });
 };
 
-
 exports.update = function (req, res) {
-  Recipe.findOneAndUpdate({ _id: req.params.recipeId, user: req.session.userId }, req.body, { new: true, runValidators: true }, function (err, recipe) {
+  Recipe.findOneAndUpdate({ _id: req.params.recipeId, user: req.session.userId }, req.body, { new: true, runValidators: true })
+    .populate('user', 'username')
+    .populate('comments.user', 'username')
+    .exec(function (err, recipe) {
     if (err) {
       return res.status(400).send({ message: err.message });
     }
@@ -61,12 +65,33 @@ exports.update = function (req, res) {
   });
 };
 
-
 exports.delete = function (req, res) {
   Recipe.remove({_id: req.params.recipeId, user: req.session.userId}, function (err, recipe) {
     if (err) {
       return res.status(400).send({ message: err.message });
     }
     return res.json({ message: 'Recipe successfully deleted' });
+  });
+};
+
+exports.comment = function (req, res) {
+  var comment = {user: req.session.userId };
+  if(req.body.text) {
+    comment.text = req.body.text;
+  }
+  if(req.body.createdDate) {
+    comment.createdDate = req.body.createdDate;
+  }
+
+  Recipe.findOneAndUpdate({_id: req.params.recipeId}, 
+      {$push: { comments: {$each: [comment], $position: 0}}},
+      {new: true, runValidators: true})
+    .populate('user', 'username')
+    .populate('comments.user', 'username')
+    .exec(function (err, recipe) {
+    if (err) {
+      return res.status(400).send({ message: err.message });
+    }
+    return res.status(201).json(recipe);
   });
 };

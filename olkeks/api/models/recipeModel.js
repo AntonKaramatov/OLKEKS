@@ -18,9 +18,26 @@ var RecipeSchema = new Schema({
     },
     user: {
         type: Schema.Types.ObjectId,
-        required: [true, 'user is required'],
+        required: [true, 'User is required'],
         ref: 'User'
-    }
+    },
+    comments: [
+        new Schema({
+            user: {
+                type: Schema.Types.ObjectId,
+                required: [true, 'User is required'],
+                ref: 'User'
+            },
+            text: { 
+                type: String,
+                required: [true, 'Comment text is required']
+            },
+            createdDate: {
+                type: Date,
+                default: Date.now
+            }
+        })
+    ]
 });
 
 module.exports = mongoose.model('Recipes', RecipeSchema);

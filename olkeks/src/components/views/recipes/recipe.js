@@ -2,6 +2,8 @@ import React from 'react';
 import {Link} from 'react-router'
 import $ from 'jquery'
 import Alert from 'react-s-alert';
+import Comment from '../comments/comment'
+import CommentForm from '../comments/commentForm'
 
 class Recipe extends React.Component {
 
@@ -15,13 +17,14 @@ class Recipe extends React.Component {
                 name: "",
                 text: "",
                 createdDate: "",
-                user: {_id: "", username: ""}
+                user: {_id: "", username: ""},
+                comments:[]
             };
         }
         
         if(props.params && props.params.recipeId) {
             context.recipeService.get(props.params.recipeId).then((recipe) => {
-                var newState = this.state;
+                let newState = this.state;
                 newState.recipe = recipe;
                 this.setState(newState);
             });
@@ -35,6 +38,9 @@ class Recipe extends React.Component {
         this.enterEditMode = this.enterEditMode.bind(this);
         this.leaveEditMode = this.leaveEditMode.bind(this);
         this.resetChanges = this.resetChanges.bind(this);
+        this.deleteRecipe = this.deleteRecipe.bind(this);
+        this.onCommentChange = this.onCommentChange.bind(this);
+        this.submitComment = this.submitComment.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -62,8 +68,8 @@ class Recipe extends React.Component {
 
     editRecipe(e) {
         e.preventDefault();
-        this.context.recipeService.update(this.state.recipe).then((recipe) => {
-            recipe.user = {_id: this.context.session.userId, username: this.context.session.username};
+        let recipe = {_id: this.state.recipe._id, name: this.state.recipe.name, text: this.state.recipe.text};
+        this.context.recipeService.update(recipe).then((recipe) => {
             this.setState({recipe: recipe, edit: false});
             Alert.success("Recipe edited successfully.", {position: "top-left"});
         }, this.context.apiErrorHandler);
@@ -83,6 +89,27 @@ class Recipe extends React.Component {
         e.preventDefault();
         let oldRecipe = $.extend(true, {}, this.state.oldRecipe);
         this.setState({recipe: this.state.oldRecipe, oldRecipe: oldRecipe, edit: true});
+    }
+
+    deleteRecipe(e) {
+        e.preventDefault();
+        this.context.recipeService.delete(this.state.recipe._id).then((recipe) => {            
+            this.context.router.push({ pathname: "/recipes" });
+            Alert.success("Recipe deleted successfully.", {position: "top-left"});
+        }, this.context.apiErrorHandler);
+    }
+
+    onCommentChange(e) {
+        this.setState({ comment: e.target.value, recipe: this.state.recipe });
+    }
+
+    submitComment(e) {
+        e.preventDefault();
+        let comment = {text: this.state.comment, createdDate: new Date()};
+        this.context.recipeService.comment(this.state.recipe._id, comment).then((recipe) => {
+            this.setState({comment: "", recipe: recipe});
+            Alert.success("Comment submited successfully.", {position: "top-left"});
+        }, this.context.apiErrorHandler);
     }
 
     render() {
@@ -105,12 +132,25 @@ class Recipe extends React.Component {
                 </form>
             )
         } else if(showDetails) {
+            let commentNodes = this.state.recipe.comments.map((comment) => {
+                return (
+                    <Comment comment={comment} key={comment._id} />
+                )
+            });
+
             return (
                 <div>
-                    <h2>{this.state.recipe.name}</h2>
-                    <p>Published on {new Date(this.state.recipe.createdDate).toDateString()} by {this.state.recipe.user.username}</p>
-                    <pre>{this.state.recipe.text}</pre>
-                    {this.context.session.userId === this.state.recipe.user._id && (<button className="btn btn-info" onClick={this.enterEditMode}>Edit</button>)}
+                    <div className="recipe-details">
+                        <h2>{this.state.recipe.name}</h2>
+                        <p>Published on {new Date(this.state.recipe.createdDate).toDateString()} by {this.state.recipe.user.username}</p>
+                        <pre>{this.state.recipe.text}</pre>
+                        {this.context.session.userId === this.state.recipe.user._id && (<button className="btn btn-info" onClick={this.enterEditMode}>Edit</button>)}
+                        {this.context.session.userId === this.state.recipe.user._id && (<button className="btn btn-danger" onClick={this.deleteRecipe}>Delete</button>)}
+                    </div>
+
+                    {this.context.session.userId && <CommentForm comment={this.state.comment} onCommentChange={this.onCommentChange} submitComment={this.submitComment}/>}
+
+                    {commentNodes}
                 </div>
             )
         } else {
