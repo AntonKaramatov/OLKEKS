@@ -6,22 +6,29 @@ import SearchPanel from './searchPanel'
 const Navigation = ({children}, context) => {
 
     return (
-        <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-            <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span className="navbar-toggler-icon"></span>
-            </button>
+        <nav className="navbar navbar-default">
+            <div className="container-fluid">
+                <div className="navbar-header">
+                    <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span className="sr-only">Toggle navigation</span>
+                        <span className="icon-bar"></span>
+                        <span className="icon-bar"></span>
+                        <span className="icon-bar"></span>
+                    </button>
+                    <NavLink className="navbar-brand" to="/recipes">OLKEKS</NavLink>
+                </div>
 
-            <NavLink className="navbar-brand" to="/recipes">OLKEKS</NavLink>
-            <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div className="navbar-nav">
-                    {context.session.userId && (<NavLink className="nav-item nav-link" to={{pathname: "/recipes", query: {userId: context.session.userId} }}>My Recipes</NavLink>)}
-                    <NavLink className="nav-item nav-link" to="/recipes">All Recipes</NavLink>
-                    {context.session.userId && (<NavLink className="nav-item nav-link" to={{pathname: "/recipe", query: {addNew: true} }}>Add Recipe</NavLink>)}
+                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul className="nav navbar-nav">
+                        {context.session.userId && (<li className="nav-item"><NavLink className="nav-item nav-link" to={{pathname: "/recipes", query: {userId: context.session.userId} }}>My Recipes</NavLink></li>)}
+                        <li className="nav-item"><NavLink className="nav-item nav-link" to="/recipes">All Recipes</NavLink></li>
+                        {context.session.userId && (<li className="nav-item"><NavLink className="nav-item nav-link" to={{pathname: "/recipe", query: {addNew: true} }}>Add Recipe</NavLink></li>)}
+                    </ul>
+            
+                    <SearchPanel />
+                    <UserPanel />
                 </div>
             </div>
-
-            <SearchPanel />
-            <UserPanel />
         </nav>
     );
 }

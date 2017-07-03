@@ -47,6 +47,7 @@ class RecipeList extends React.Component {
 
         return (
             <div>
+                {this.state.recipes.length === 0 && <span>No recipes found.</span>}
                 {recipeNodes}
             </div>
         );

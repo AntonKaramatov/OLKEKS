@@ -13,6 +13,9 @@ exports.register = function (req, res) {
         if(user !== null) {
             return res.status(400).send({ message: "Username taken." });
         }
+        if(requestUser.password === "") {
+            return res.status(400).send({ message: "Password is required." });
+        }
         requestUser.password = passwordHash.generate(requestUser.password);
         requestUser.save(function (err, user) {
             if(err) {

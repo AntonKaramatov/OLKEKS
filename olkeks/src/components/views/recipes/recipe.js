@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router'
 import $ from 'jquery'
+import Alert from 'react-s-alert';
 
 class Recipe extends React.Component {
 
@@ -48,19 +49,23 @@ class Recipe extends React.Component {
         this.setState({ recipe: recipe });
     }
 
-    addRecipe() {
+    addRecipe(e) {
+        e.preventDefault();
         let recipe = {name: this.state.recipe.name, text: this.state.recipe.text, createdDate: new Date()};
         this.context.recipeService.add(recipe).then((recipe) => {
             recipe.user = {_id: this.context.session.userId, username: this.context.session.username};
             this.setState({recipe: recipe});
             this.context.router.push({ pathname: `/recipe/${recipe._id}` });
+            Alert.success("Recipe added successfully.", {position: "top-left"});
         }, this.context.apiErrorHandler);
     }
 
-    editRecipe() {
+    editRecipe(e) {
+        e.preventDefault();
         this.context.recipeService.update(this.state.recipe).then((recipe) => {
             recipe.user = {_id: this.context.session.userId, username: this.context.session.username};
             this.setState({recipe: recipe, edit: false});
+            Alert.success("Recipe edited successfully.", {position: "top-left"});
         }, this.context.apiErrorHandler);
     }
 
@@ -69,11 +74,13 @@ class Recipe extends React.Component {
         this.setState({recipe: this.state.recipe, oldRecipe: oldRecipe, edit: true});
     }
 
-    leaveEditMode() {
+    leaveEditMode(e) {
+        e.preventDefault();
         this.setState({recipe: this.state.oldRecipe, edit: false});
     }
 
-    resetChanges() {
+    resetChanges(e) {
+        e.preventDefault();
         let oldRecipe = $.extend(true, {}, this.state.oldRecipe);
         this.setState({recipe: this.state.oldRecipe, oldRecipe: oldRecipe, edit: true});
     }
@@ -86,33 +93,35 @@ class Recipe extends React.Component {
 
         if(addNew || edit) {
             return (
-                <div>
-                    <label htmlFor="name">Recipe name: </label>
-                    <input type="text" name="name" id="name" value={this.state.recipe.name} onChange={this.handleTextChange} />
-                    <label htmlFor="text">Recipe text: </label>
-                    <textarea name="text" id="text" value={this.state.recipe.text} onChange={this.handleTextChange} />
-                    {addNew && (<button onClick={this.addRecipe}>Add</button>)}
-                    {edit && (<button onClick={this.editRecipe}>Save</button>)}
-                    {edit && (<button onClick={this.resetChanges}>Reset</button>)}
-                    {edit && (<button onClick={this.leaveEditMode}>Cancel</button>)}
-                </div>
+                <form>
+                    <label className="form-label" htmlFor="name">Recipe name: </label>
+                    <input className="form-control" type="text" name="name" id="name" value={this.state.recipe.name} onChange={this.handleTextChange} />
+                    <label className="form-label" htmlFor="text">Recipe text: </label>
+                    <textarea className="form-control recipe-text" name="text" id="text" value={this.state.recipe.text} onChange={this.handleTextChange} />
+                    {addNew && (<button className="btn btn-info" onClick={this.addRecipe}>Add</button>)}
+                    {edit && (<button className="btn btn-info" onClick={this.editRecipe}>Save</button>)}
+                    {edit && (<button className="btn btn-warning" onClick={this.resetChanges}>Reset</button>)}
+                    {edit && (<button className="btn btn-danger" onClick={this.leaveEditMode}>Cancel</button>)}
+                </form>
             )
         } else if(showDetails) {
             return (
                 <div>
-                    <h4>{this.state.recipe.name}</h4>
-                    <p>{this.state.recipe.user.username}</p>
-                    <p>{this.state.recipe.createdDate}</p>
+                    <h2>{this.state.recipe.name}</h2>
+                    <p>Published on {new Date(this.state.recipe.createdDate).toDateString()} by {this.state.recipe.user.username}</p>
                     <pre>{this.state.recipe.text}</pre>
-                    {this.context.session.userId === this.state.recipe.user._id && (<button onClick={this.enterEditMode}>Edit</button>)}
+                    {this.context.session.userId === this.state.recipe.user._id && (<button className="btn btn-info" onClick={this.enterEditMode}>Edit</button>)}
                 </div>
             )
         } else {
             return (
-                <div>
-                    <Link to={{ pathname: `/recipe/${this.state.recipe._id}`}}>{this.state.recipe.name}</Link>
-                    <p>{this.state.recipe.user.username}</p>
-                    <p>{this.state.recipe.createdDate}</p>
+                <div className="panel panel-default">
+                    <div className="panel-heading">
+                        <Link to={{ pathname: `/recipe/${this.state.recipe._id}`}}>{this.state.recipe.name}</Link>    
+                    </div>        
+                    <div className="panel-body">
+                        <p>Published on {new Date(this.state.recipe.createdDate).toDateString()} by {this.state.recipe.user.username}</p>
+                    </div>
                 </div>
             )
         }

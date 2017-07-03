@@ -18,13 +18,13 @@ class UserPanel extends React.Component {
 
     render() {
         return (
-            <div>
-                {this.context.session.username && (<span>Welcome, {this.context.session.username}!</span>)}
-                {this.context.session.username && (<button onClick={this.logout}>Logout</button>)}
+            <ul className="nav navbar-nav navbar-right">
+                {this.context.session.username && (<li className="nav-item"><span className="navbar-text">Welcome, {this.context.session.username}!</span></li>)}
+                {this.context.session.username && (<li className="nav-item"><button className="btn btn-default navbar-btn" onClick={this.logout}>Logout</button></li>)}
 
-                {!this.context.session.username && (<Link to="/user">Log in</Link>)}
-                {!this.context.session.username && (<Link to={{pathname: "/user", query: {register: true} }}>Sign up</Link>)}
-            </div>
+                {!this.context.session.username && (<li className="nav-item"><p className="navbar-btn"><Link className="btn btn-default" to="/user">Log in</Link></p></li>)}
+                {!this.context.session.username && (<li className="nav-item"><p className="navbar-btn"><Link className="btn btn-default" to={{pathname: "/user", query: {register: true} }}>Sign up</Link></p></li>)}
+            </ul>
         )
     }
 }

@@ -38,13 +38,11 @@ class User extends React.Component {
         let register = (this.props.location && this.props.location.query && this.props.location.query.register === 'true');
         
         return (
-            <form onSubmit={register ? this.register : this.login}>
-                <label htmlFor="username">Username: </label>
-                <input type="text" name="username" id="username" onChange={this.handleTextChange} />
-                <label htmlFor="password">Password: </label>
-                <input type="password" name="password" id="password" onChange={this.handleTextChange} />
-                {register && (<button type="submit">Register</button>)}
-                {!register && (<button type="submit">Login</button>)}
+            <form className="user-form" onSubmit={register ? this.register : this.login}>
+                <input type="text" name="username" id="username" className="form-control" placeholder="Username" onChange={this.handleTextChange} />
+                <input type="password" name="password" id="password" className="form-control" placeholder="Password" onChange={this.handleTextChange} />
+                {register && (<button type="submit" className="btn btn-lg btn-primary btn-block">Register</button>)}
+                {!register && (<button type="submit" className="btn btn-lg btn-primary btn-block">Login</button>)}
             </form>
         )
     }

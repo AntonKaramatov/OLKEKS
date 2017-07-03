@@ -1,6 +1,9 @@
 import React from 'react';
 import Navigation from '../navigation/navigation'
 
+import Alert from 'react-s-alert';
+import 'react-s-alert/dist/s-alert-default.css';
+
 import RecipeService from '../../services/recipeService'
 import UserService from '../../services/userService'
 
@@ -40,7 +43,7 @@ class App extends React.Component {
       apiErrorHandler: (error) => {
         if(error.status === 401) {
           if(this.session.userId) {
-            alert("Your session has expired. Please log in.");
+            Alert.error("Your session has expired. Please log in.", {position: "top"});
           }
           this.setSession({});
           this.context.router.push({ pathname: "/user" });          
@@ -53,7 +56,7 @@ class App extends React.Component {
             message = errorMessage.message;
           }
         }
-        alert(message);
+        Alert.error(message, {position: "top"});
       }
     };
   }
@@ -62,9 +65,10 @@ class App extends React.Component {
     return (
       <div>
         <Navigation />
-        <div>
+        <div className="container">
           {this.props.children}
         </div>
+        <Alert stack={{limit: 3}} />
       </div>
     );
   }
